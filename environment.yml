@@ -1,0 +1,24 @@
+name: anatomy-informed-tmj-prediction
+channels:
+  - pytorch
+  - nvidia
+  - pyg
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy>=2.1
+  - pandas>=2.2
+  - scipy>=1.13
+  - scikit-learn>=1.5
+  - matplotlib>=3.9
+  - seaborn>=0.13
+  - openpyxl>=3.1
+  - tqdm>=4.66
+  - pytorch>=2.1
+  - pytorch-cuda=12.1
+  - pyg
+  - pip
+  - pip:
+      - torch-geometric>=2.5
+      - xgboost>=2.0

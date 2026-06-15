@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.ipynb_checkpoints/
+
+# Raw/sensitive data
+data.xlsx
+*.xlsx
+!GNN/.gitkeep
+
+# Heavy or generated experiment artifacts
+runs_seed/
+AutogluonModels/
+Autogluon.log
+analysis.ipynb
+virtual_tmj_patients.csv
+*.pth
+*.pt
+*.ckpt
+*.png
+*.csv
+*.log
+
