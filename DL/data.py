@@ -265,13 +265,33 @@ def load_raw_dataframe() -> pd.DataFrame:
     return df
 
 
+def _detect_average_columns(columns: list) -> list:
+    """识别左右均值列：若存在 `X/mm_左`(或 `X/°_左`/_右) 这样的分侧列，
+    则无单位列 `X` 即为其 (左+右)/2 均值，与左右原值冗余，应剔除。
+    仅保留左右分侧列作为解剖节点输入。"""
+    bases = set()
+    for k in columns:
+        if isinstance(k, str) and (k.endswith("_左") or k.endswith("_右")):
+            b = k[:-2]
+            for suf in ("/mm", "/°"):
+                if b.endswith(suf):
+                    b = b[: -len(suf)]
+                    break
+            bases.add(b)
+    return [c for c in columns if isinstance(c, str) and c in bases]
+
+
 def _build_features_from_dataframe(
     df: pd.DataFrame,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, List[int], List[str]]:
     """在给定 DataFrame 上执行清洗 + 特征工程，构建特征与标签。"""
     # 1. 删除隐私列与明显无关列
-    ignore_cols = ["姓名", "影像", "关节症状", "牙型", "骨型"]
+    ignore_cols = ["姓名", "影像", "关节症状", "牙型", "骨型", "CHO 的比例α"]
     df = df.drop(columns=[c for c in ignore_cols if c in df.columns])
+
+    # 1b. 剔除左右均值列((左+右)/2, 与左右分侧列冗余), 仅保留分侧列作为解剖节点
+    _avg_cols = _detect_average_columns(list(df.columns))
+    df = df.drop(columns=[c for c in _avg_cols if c in df.columns])
 
     # 2. 删除缺失率过高的列
     missing_profile = df.isna().mean()

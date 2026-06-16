@@ -83,12 +83,9 @@ class NodeIndex:
     fossa_r: int = 4
     space_l: int = 5
     space_r: int = 6
-    mandible_l: int = 7
-    mandible_r: int = 8
-    global_demo: int = 9
-    global_occlusion: int = 10
-    global_mandible: int = 11
-    global_ratio: int = 12
+    age: int = 7
+    global_occlusion: int = 8
+    global_mandible: int = 9
 
 
 NODE_INDEX = NodeIndex()
@@ -109,11 +106,9 @@ def _assign_node_for_feature(name: str) -> int:
     - 关节窝* -> fossa
     - *间隙* -> space
     - 髁突* 且有左右 -> condyle
-    - 下颌体长度/下颌支长度 且有左右 -> mandible
-    - 年龄（无左右）-> global_demo
+    - 年龄（无左右）-> age
     - 咬合/角度/垂直维度类（无左右）-> global_occlusion
     - 下颌整体尺度类（无左右）-> global_mandible
-    - 比例/指数类（无左右）-> global_ratio
     - 其它 -> global
     """
     side = _side_from_name(name)
@@ -122,7 +117,7 @@ def _assign_node_for_feature(name: str) -> int:
     # ---- 全局语义（无左右后缀）优先分流到对应 global-type 节点 ----
     if side is None:
         if "年龄" in base:
-            return NODE_INDEX.global_demo
+            return NODE_INDEX.age
 
         # 咬合/角度/垂直维度：通常是个体整体姿态/咬合模式，不绑定某一侧解剖节点
         if (
@@ -137,19 +132,12 @@ def _assign_node_for_feature(name: str) -> int:
         if ("下颌体长度" in base) or ("下颌支长度" in base) or ("下颌骨长度" in base):
             return NODE_INDEX.global_mandible
 
-        # 比例/指数
-        if ("比例" in base) or ("CHO" in base) or ("α" in base):
-            return NODE_INDEX.global_ratio
-
     if "关节窝" in base and side is not None:
         return NODE_INDEX.fossa_l if side == "L" else NODE_INDEX.fossa_r
     if "间隙" in base and side is not None:
         return NODE_INDEX.space_l if side == "L" else NODE_INDEX.space_r
     if "髁突" in base and side is not None:
         return NODE_INDEX.condyle_l if side == "L" else NODE_INDEX.condyle_r
-    if ("下颌体长度" in base or "下颌支长度" in base) and side is not None:
-        return NODE_INDEX.mandible_l if side == "L" else NODE_INDEX.mandible_r
-
     return NODE_INDEX.global_idx
 
 

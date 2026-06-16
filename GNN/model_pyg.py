@@ -31,7 +31,7 @@ class GraphSpecPyG:
 def build_default_tmj_graph_spec_pyg(*, self_loops: bool = False) -> GraphSpecPyG:
     """构建与 `build_default_tmj_graph_spec()` 一致语义的固定 TMJ 小图（PyG edge_index）。
 
-    节点顺序（n_nodes=13）与旧实现保持一致：
+    节点顺序（n_nodes=10）与旧实现保持一致：
       0: global
       1: condyle_L
       2: condyle_R
@@ -39,15 +39,12 @@ def build_default_tmj_graph_spec_pyg(*, self_loops: bool = False) -> GraphSpecPy
       4: fossa_R
       5: space_L
       6: space_R
-      7: mandible_L
-      8: mandible_R
-      9:  global_demo
-      10: global_occlusion
-      11: global_mandible
-      12: global_ratio
+      7:  age
+      8: global_occlusion
+      9: global_mandible
     """
 
-    n_nodes = 13
+    n_nodes = 10
     global_idx = 0
 
     edges: list[tuple[int, int]] = []
@@ -68,19 +65,16 @@ def build_default_tmj_graph_spec_pyg(*, self_loops: bool = False) -> GraphSpecPy
     add_undirected(1, 2)  # condyle L-R
     add_undirected(3, 4)  # fossa L-R
     add_undirected(5, 6)  # space L-R
-    add_undirected(7, 8)  # mandible L-R
 
     # ipsilateral anatomy edges (L)
     add_undirected(1, 3)  # condyle_L - fossa_L
     add_undirected(3, 5)  # fossa_L - space_L
     add_undirected(1, 5)  # condyle_L - space_L
-    add_undirected(7, 1)  # mandible_L - condyle_L
 
     # ipsilateral anatomy edges (R)
     add_undirected(2, 4)  # condyle_R - fossa_R
     add_undirected(4, 6)  # fossa_R - space_R
     add_undirected(2, 6)  # condyle_R - space_R
-    add_undirected(8, 2)  # mandible_R - condyle_R
 
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()  # (2, E)
     return GraphSpecPyG(n_nodes=n_nodes, global_idx=global_idx, edge_index=edge_index)
